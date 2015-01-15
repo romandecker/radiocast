@@ -23,17 +23,9 @@ module.exports.setup = function( app ) {
         res.render( "index" );
     } );
 
-    // creates basic CRUD-routes for the given controller
-    var crud = function( routepart, ctrl ) {
-        router.get( "/" + routepart, ctrl.index.bind(ctrl) );
-        router.post( "/" + routepart, ctrl.create.bind(ctrl) );
-        router.get( "/" + routepart + "/:id", ctrl.get.bind(ctrl) );
-        router.put( "/" + routepart + "/:id", ctrl.update.bind(ctrl) );
-        router.delete( "/" + routepart + "/:id", ctrl.destroy.bind(ctrl) );
-    };
-    
     var users = new UserController();
-    crud( "users", users );
+
+    router.get( "/users", users.auth.bind(users), users.index.bind(users) );
 
     router.put( "/auth/login", users.login.bind(users) );
 

@@ -27,6 +27,7 @@ if( ["development",
 
 var express = require( "express" );
 var bodyParser = require( "body-parser" );
+var cookieParser = require( "cookie-parser" );
 var config = require( "config" );
 var glob = require( "glob" );
 
@@ -39,6 +40,7 @@ var app = express();
 app.use( config.get("logger") );
 
 app.use( bodyParser.json() );
+app.use( cookieParser("yourappsecret") );
 
 var bookshelf = require("./app/models/BaseModel");
 app.set( "bookshelf", bookshelf ); 

@@ -26,14 +26,28 @@ app.service( "dialogs", function( $modal ) {
                 modalFade: true,
                 templateUrl: "public/views/partials/login.html"
             },
-            controller: function( $scope, $timeout, AuthenticationService ) {
+            controller: function( $scope,
+                                  $timeout,
+                                  $modalInstance,
+                                  AuthenticationService ) {
                 $timeout( function() {
                     $( "input#login-email" ).focus();
                 }, 100 );
 
                 $scope.login = function() {
-                    AuthenticationService.login( $scope.email,
-                                                 $scope.password );
+                    AuthenticationService.login(
+                        $scope.email,
+                        $scope.password
+                    ).then( function( token ) {
+                        $modalInstance.close( token );
+                    } ).catch( function( response ) {
+                        if( response.status === 400 ) {
+                            $scope.loginFailed = true;
+                        } else {
+                            console.log( response );
+                            alert( "Unable to log in, please try again later" );
+                        }
+                    } );
                 };
             }
         }

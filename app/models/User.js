@@ -74,12 +74,20 @@ var User = bookshelf.model( "User", {
                     return user.save(
                         { session: token },
                         { patch: true, transacting: tx }
-                    );
+                    ).return( token );
                 } else {
                     //password incorrect
                     return null;
                 }
             } );
+        } );
+    },
+
+    bySession: function( token ) {
+        return User.where(
+            { session: token }
+        ).fetch().then( function( user ) {
+            return user;
         } );
     }
 } );

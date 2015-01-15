@@ -16,8 +16,9 @@ app.factory( "AuthenticationService", function( $http ) {
                     password: password
                 }
             } ).then( function( response ) {
-                if( response === 200 ) {
+                if( response.status === 200 ) {
                     token = response.token;
+                    return token;
                 } else {
                     throw response;
                 }

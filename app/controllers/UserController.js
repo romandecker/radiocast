@@ -13,7 +13,27 @@ module.exports = BaseController.extend( {
     },
 
     index: function( req, res ) {
-        res.status( 401 ).send();
+
+        var query = User.query();
+
+        var p;
+        if( this.pagination &&
+            (this.pagination.type !== "auto" || req.query.page) ) {
+
+            p = this.paginate( query, req.query );
+        } else {
+            p = query.select().then( function( results ) {
+                return User.collection( results );
+            } );
+        }
+
+        p.then( function( results ) {
+            res.json( results );
+        } ).catch( function( error ) {
+            console.error( error );
+            res.status( 500 ).json( error );
+        } );
+
     },
 
     login: function( req, res ) {
@@ -50,6 +70,22 @@ module.exports = BaseController.extend( {
 
     logout: function( req, res ) {
 
+    },
+
+    auth: function( req, res, next ) {
+
+        if( req.cookies.session ) {
+            User.bySession( req.cookies.session ).then( function( user ) {
+                if( user ) {
+                    //TODO set user in session
+                    next();
+                } else {
+                    res.status( 401 ).send();
+                }
+            } );
+        } else {
+            res.status( 401 ).send();
+        }
     }
 
 } );
