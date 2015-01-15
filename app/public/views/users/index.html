@@ -1,0 +1,18 @@
+<h1>User list</h1>
+
+<paginated ng-model="users" page="page" perPage="{{perPage}}">
+    <ul ng-show="users.items.length"
+        ng-repeat="user in users.items">
+        <li>
+            <a href="#/users/{{user.id}}">
+                {{user.email}}
+            </a>
+        </li>
+    </ul>
+
+    <p ng-hide="users.items.length">
+        No users available!
+    </p>
+
+    <a href="#/users/create">Create a new user</a>
+</paginated>

@@ -1,0 +1,11 @@
+{
+    "db": {
+        "client": "mysql",
+        "connection": {
+            "host": "localhost",
+            "user": "yourapp",
+            "charset": "utf8"
+        }
+    },
+    "port": 3000
+}

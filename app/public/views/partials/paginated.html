@@ -1,0 +1,16 @@
+<div>
+    <div ng-transclude>
+
+    </div>
+    <div class="text-center">
+        <pagination
+            ng-model="page"
+            rotate="true"
+            total-items="collection.totalCount"
+            items-per-page="{{perPage}}"
+            direction-links="true"
+            boundary-links="true"
+            max-size="10">
+        </pagination>
+    </div>
+</div>
