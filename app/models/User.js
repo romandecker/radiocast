@@ -21,8 +21,9 @@ var User = bookshelf.model( "User", {
         
         var ret = bookshelf.Model.prototype.saving.apply( this, arguments );
 
-        var salt = rand( 512, 36 );
+        var salt;
         if( this.isNew() ) {
+            salt = rand( 512, 36 );
             model.set( "salt", salt );
         } else {
             salt = model.get( "salt" );
@@ -49,9 +50,15 @@ var User = bookshelf.model( "User", {
     },
     logout: function() {
         return this.save( { session: null }, { patch: true } );
+    },
+    pruneSensitiveData: function() {
+        return this.omit( "pwhash",
+                          "salt",
+                          "session",
+                          "deleted" );
     }
 }, {
-    login: function( username, password ) {
+    login: function( username, password, sessionId ) {
         return bookshelf.transaction( function( tx ) {
 
             //search for the user with the given username
@@ -68,13 +75,10 @@ var User = bookshelf.model( "User", {
 
                 if( user.hasPassword(password) ) {
                 
-                    //if password matches
-                    var token = rand( 320, 36 );
-
                     return user.save(
-                        { session: token },
+                        { session: sessionId },
                         { patch: true, transacting: tx }
-                    ).return( token );
+                    ).return( user );
                 } else {
                     //password incorrect
                     return null;

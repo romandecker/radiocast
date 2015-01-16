@@ -17,13 +17,23 @@ module.exports = BaseController.extend( {
         var query = User.query();
 
         var p;
+
         if( this.pagination &&
             (this.pagination.type !== "auto" || req.query.page) ) {
 
-            p = this.paginate( query, req.query );
+            p = this.paginate( query, req.query ).then( function( results ) {
+                
+                results.items = results.items.map( function(user) {
+                    return user.pruneSensitiveData();
+                } );
+               
+                return results;
+            } );
         } else {
             p = query.select().then( function( results ) {
-                return User.collection( results );
+                return User.collection( results ).map( function( user ) {
+                    return user.pruneSensitiveData();
+                } );
             } );
         }
 
@@ -33,12 +43,27 @@ module.exports = BaseController.extend( {
             console.error( error );
             res.status( 500 ).json( error );
         } );
+    },
 
+    get: function( req, res ) {
+        
+        var id = req.params.id;
+
+        User.where( {id: id} ).fetch().then( function( user ) {
+            if( !user ) {
+                res.status( 404 ).send();
+            } else {
+                res.json( user.omit("pwhash",
+                                    "salt",
+                                    "session",
+                                    "deleted") );
+            }
+        } ).catch( function(error) {
+            res.status( 500 ).json( error );
+        } );
     },
 
     login: function( req, res ) {
-
-        User.login( req.body.username, req.body.password );
 
         if( !req.body.username ||
             !req.body.password ) {
@@ -50,16 +75,14 @@ module.exports = BaseController.extend( {
 
         User.login(
             req.body.username,
-            req.body.password
-        ).then( function( token ) {
-            if( !token ) {
+            req.body.password,
+            req.sessionID
+        ).then( function( user ) {
+            if( !user ) {
                 res.status( 400 ).send();
             } else {
-                res.cookie( "session", token, {
-                    path: "/",
-                    expires: 0      //indicates session cookie
-                } );
-                res.json( { session: token } );
+                req.session.user = user;
+                res.status( 200 ).send();
             }
         } ).catch( function( error ) {
             console.error( error );
@@ -72,19 +95,55 @@ module.exports = BaseController.extend( {
 
     },
 
+    changePassword: function( req, res ) {
+
+        var id = req.params.id;
+        
+        User.where( {id: id} ).fetch().then( function( user ) {
+            if( !user ) {
+                return { status: 404 };
+            } else if( user.get("id")  !== req.session.user.id ){
+                return {
+                    status: 401,
+                    message: "You cannot change someone else's password!"
+                };
+            } else if( !user.hasPassword(req.body.oldPassword) ) {
+                return {
+                    status: 401,
+                    message: "Current password mismatch"
+                };
+            } else {
+                user.set( "password", req.body.newPassword );
+                return user.save().return( { status: 200 } );
+            }
+        } ).then( function( resp ) {
+            res.status( resp.status );
+            if( resp.message ) {
+                res.json( { message: resp.message } );
+            } else {
+                res.send();
+            }
+        } ).catch( function(error) {
+            console.error( error );
+            res.status( 500 ).json( error );
+        } );
+    },
+
     auth: function( req, res, next ) {
 
-        if( req.cookies.session ) {
-            User.bySession( req.cookies.session ).then( function( user ) {
+        if( !req.session.user ) {
+            User.bySession( req.sessionID ).then( function( user ) {
                 if( user ) {
-                    //TODO set user in session
+                    req.session.user = user;
                     next();
                 } else {
-                    res.status( 401 ).send();
+                    res.status( 401 ).json(
+                        { message: "You must be logged for this request" }
+                    );
                 }
             } );
         } else {
-            res.status( 401 ).send();
+            next();
         }
     }
 

@@ -9,6 +9,10 @@ app.config( ["$routeProvider", function( $routeProvider) {
             templateUrl: "public/views/users/index.html",
             controller: "UserListCtrl"
         } ).
+        when( "/users/:id", {
+            templateUrl: "public/views/users/edit.html",
+            controller: "UserEditCtrl"
+        } ).
         otherwise( {
             redirectTo: "/users"
         } );

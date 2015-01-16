@@ -25,9 +25,20 @@ module.exports.setup = function( app ) {
 
     var users = new UserController();
 
-    router.get( "/users", users.auth.bind(users), users.index.bind(users) );
+    router.get( "/users", users.auth.bind(users),
+                          users.index.bind(users) );
+
+    router.get( "/users/:id", users.auth.bind(users),
+                              users.get.bind(users) );
+
+    router.put( "/users/:id/changePassword", users.auth.bind(users),
+                                             users.changePassword.bind(users) );
+    
+    router.post( "/users", users.auth.bind(users),
+                           users.create.bind(users) );
 
     router.put( "/auth/login", users.login.bind(users) );
+
 
     // enable the api routes under "/api"
     app.use( "/api", router );

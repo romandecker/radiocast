@@ -18,6 +18,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-open" );
     grunt.loadNpmTasks( "grunt-karma" );
     grunt.loadNpmTasks( "grunt-sass" );
+    grunt.loadNpmTasks( "grunt-node-inspector" );
 
     grunt.initConfig( {
         watch: {
@@ -57,6 +58,7 @@ module.exports = function( grunt ) {
             options: {
                 script: "app.js"
             },
+            debug: { options: { node_env: "development", debug: true } },
             development: { options: { node_env: "development" }    },
             production: { options: { node_env: "production" } },
             test: {
@@ -151,6 +153,16 @@ module.exports = function( grunt ) {
                 }
             }
         },
+        "node-inspector": {
+            custom: {
+                options: {
+                    "web-port": 1337,
+                    "web-host": "localhost",
+                    "save-live-edit": true,
+                    "hidden": ["node_modules"]
+                }
+            }
+        },
         clean: {
             coverageZip: ["test/reports/api/coverage.zip"],
             doc: ["doc/**/*"]
@@ -175,6 +187,9 @@ module.exports = function( grunt ) {
         open: {
             coverage: {
                 path: "test/reports/api/lcov-report/index.html"
+            },
+            inspector: {
+                path: "http://localhost:1337/debug?port=5858"
             }
         }
     } );
@@ -216,6 +231,10 @@ module.exports = function( grunt ) {
 
     //lint once, then start server and watch for changes
     grunt.registerTask( "server", ["lint", "express:development", "watch"] );
+
+    grunt.registerTask( "server:debug", ["express:debug",
+                                         "open:inspector",
+                                         "node-inspector"] );
 
     //start the server in test setup and then run the tests
     grunt.registerTask( "test:api", 

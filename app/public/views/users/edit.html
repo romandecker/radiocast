@@ -1,0 +1,84 @@
+<h1>Edit user</h1>
+<form ng-submit="save()">
+    <div class="form-group">
+        <label for="email">e-Mail:</label>
+        <input type="email"
+               ng-readonly="!user.$isNew"
+               value="{{user.email}}"
+               placeholder="e-Mail address"
+               ng-focus="!user.$isNew"
+               class="form-control">
+    </div>
+
+    <div ng-show="user.$isNew">
+        <h2>Password</h2>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password"
+                   ng-model="user.password"
+                   required
+                   class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="password">Confirm password:</label>
+            <input type="password"
+                   ng-model="passwordConfirmation"
+                   required
+                   class="form-control">
+        </div>
+
+    </div>
+    <div class="form-group">
+        <input type="submit"
+               ng-disabled="!user.password.length ||
+                            user.password !== passwordConfirmation"
+               class="btn btn-primary">
+    </div>
+</form>
+
+<div ng-if="!user.$isNew">
+    <h2>Change password</h2>
+
+    <form ng-submit="changePassword()">
+        
+        <div ng-if="message" class="alert {{message.cls}}">
+            {{message.text}}
+        </div>
+        <div ng-if="user.password.length &&
+                  user.password !== passwordConfirmation"
+            class="alert alert-danger">
+            Passwords do not match!
+        </div>
+
+        <div class="form-group">
+            <label for="password">Current password:</label>
+            <input type="password"
+                   ng-model="oldPassword"
+                   required
+                   class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="password">New password:</label>
+            <input type="password"
+                   ng-model="user.password"
+                   required
+                   class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="password">Confirm new password:</label>
+            <input type="password"
+                   ng-model="passwordConfirmation"
+                   required
+                   class="form-control">
+        </div>
+        
+
+        <div class="form-group">
+            <input type="submit"
+                   ng-disabled="!user.password.length ||
+                                user.password !== passwordConfirmation"
+                   class="btn btn-primary">
+        </div>
+    </form>
+</div>

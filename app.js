@@ -28,6 +28,7 @@ if( ["development",
 var express = require( "express" );
 var bodyParser = require( "body-parser" );
 var cookieParser = require( "cookie-parser" );
+var session = require( "express-session" );
 var config = require( "config" );
 var glob = require( "glob" );
 
@@ -41,6 +42,11 @@ app.use( config.get("logger") );
 
 app.use( bodyParser.json() );
 app.use( cookieParser("yourappsecret") );
+app.use( session({
+    secret: "yourappsecret",
+    resave: false,
+    saveUninitialized: true
+}) );
 
 var bookshelf = require("./app/models/BaseModel");
 app.set( "bookshelf", bookshelf ); 

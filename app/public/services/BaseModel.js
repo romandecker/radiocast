@@ -164,11 +164,19 @@ app.factory( "$Model", function( $http,
 
     BaseModel.$get = function( id ) {
 
+        var self = this;
+
         return $http( {
             method: "GET",
             url: this.prototype.$url + "/" + id
         } ).then( BaseModel.$unpackResponse )
-           .then( BaseModel.$makeObjectFromResponse.bind(this) );
+           .then( BaseModel.$makeObjectFromResponse.bind(this) )
+           .catch( function( response ) {
+
+            if( response.status === 401 ) {
+                return dialogs.login().then( self.$get.bind(self, id) );
+            }
+       } );
     };
 
     BaseModel.$query = function( params ) {
