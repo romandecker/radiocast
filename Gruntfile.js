@@ -19,6 +19,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-karma" );
     grunt.loadNpmTasks( "grunt-sass" );
     grunt.loadNpmTasks( "grunt-node-inspector" );
+    grunt.loadNpmTasks( "grunt-execute" );
 
     grunt.initConfig( {
         watch: {
@@ -99,6 +100,11 @@ module.exports = function( grunt ) {
                 };
                 
                 cb( null, cfg );
+            }
+        },
+        execute: {
+            repl: {
+                src: ["repl.js"]
             }
         },
         jshint: {
@@ -204,6 +210,11 @@ module.exports = function( grunt ) {
 
     var envs = ["development", "test", "production"];
     var knexCommands = ["latest", "rollback", "currentVersion"];
+
+    grunt.registerTask( "repl", [ "env:development", "execute:repl" ] );
+    envs.forEach( function(env) {
+        grunt.registerTask( "repl:" + env, [ "env:" + env, "execute:repl" ] );
+    } );
 
     //register migration tasks
     knexCommands.forEach( function(cmd) {
