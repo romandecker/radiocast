@@ -92,8 +92,7 @@ module.exports = function( grunt ) {
                             user: db.connection.user,
                             password: db.connection.password,
                             database: db.connection.database
-                        },
-                        seeds: db.seeds
+                        }
                     },
                     pool: {
                         max: 1
@@ -104,9 +103,6 @@ module.exports = function( grunt ) {
             }
         },
         execute: {
-            repl: {
-                src: ["repl.js"]
-            },
             makeSeed: {
                 src: ["app/seeds/seed.js"],
                 options: {
@@ -224,10 +220,7 @@ module.exports = function( grunt ) {
     var envs = ["development", "test", "production"];
     var knexCommands = ["latest", "rollback", "currentVersion"];
 
-    grunt.registerTask( "repl", [ "env:development", "execute:repl" ] );
     envs.forEach( function(env) {
-        grunt.registerTask( "repl:" + env, [ "env:" + env, "execute:repl" ] );
-
         grunt.registerTask( "seed:" + env + ":make",
                             "Create a new " + env + " seed file.",
                             function( name ) {

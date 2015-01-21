@@ -1,9 +1,15 @@
+/**
+ * @file As grunt-knex-migrate does not support seeding (yet), this is the
+ * alternative solution. This script will use knex to create and run seed files.
+ * It operates dependant of the current environment which is detected the same
+ * way the actual app detects the environment.
+ * 
+ * @namespace app
+ */
 "use strict";
 
-var _ = require( "underscore" );
 var path = require( "path" );
 var dateFormat = require( "dateformat" );
-var fs = require( "fs" );
 require( "string.prototype.endswith" );
 require( "colors" );
 require( "sugar" );
@@ -76,5 +82,3 @@ bookshelf.onSchemaLoaded( function() {
     }
 
 } );
-
-
