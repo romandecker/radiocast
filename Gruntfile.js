@@ -92,7 +92,8 @@ module.exports = function( grunt ) {
                             user: db.connection.user,
                             password: db.connection.password,
                             database: db.connection.database
-                        }
+                        },
+                        seeds: db.seeds
                     },
                     pool: {
                         max: 1
@@ -105,6 +106,18 @@ module.exports = function( grunt ) {
         execute: {
             repl: {
                 src: ["repl.js"]
+            },
+            makeSeed: {
+                src: ["app/seeds/seed.js"],
+                options: {
+                    args: ["make"]
+                }
+            },
+            runSeed: {
+                src: ["app/seeds/seed.js"],
+                options: {
+                    args: ["run"]
+                }
             }
         },
         jshint: {
@@ -214,6 +227,23 @@ module.exports = function( grunt ) {
     grunt.registerTask( "repl", [ "env:development", "execute:repl" ] );
     envs.forEach( function(env) {
         grunt.registerTask( "repl:" + env, [ "env:" + env, "execute:repl" ] );
+
+        grunt.registerTask( "seed:" + env + ":make",
+                            "Create a new " + env + " seed file.",
+                            function( name ) {
+
+            console.log( "passing", name );
+            grunt.task.run( "env:" + env );
+            grunt.config.set( "execute.makeSeed.options.args", ["make", name] );
+            grunt.option( "args", [ "make", name ] );
+            grunt.task.run( "execute:makeSeed" );
+        } );
+
+        grunt.registerTask(
+            "seed:" + env + ":run",
+            "Run all seed files for " + env,
+            [ "env:" + env, "execute:runSeed" ]
+        );
     } );
 
     //register migration tasks
@@ -238,6 +268,7 @@ module.exports = function( grunt ) {
 
         grunt.task.run( "knexmigrate:make:" + name );
     } );
+
 
 
     //lint once, then start server and watch for changes
