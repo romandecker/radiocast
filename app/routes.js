@@ -28,6 +28,9 @@ module.exports.setup = function( app ) {
     router.get( "/users", users.auth.bind(users),
                           users.index.bind(users) );
 
+    router.get( "/users/loggedIn", users.auth.bind(users),
+                                   users.get.bind(users) );
+
     router.get( "/users/:id", users.auth.bind(users),
                               users.get.bind(users) );
 

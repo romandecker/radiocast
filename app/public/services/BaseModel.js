@@ -50,9 +50,7 @@ app.factory( "$Model", function( $http,
             method: method,
             url: url,
             data: data
-        } ).then( BaseModel.$unpackResponse,
-                  BaseModel.$unpackResponse
-        ).then( function( data ) {
+        } ).then( BaseModel.$unpackResponse ).then( function( data ) {
 
             if( self.$isNew ) {
                 self.$setNew( false );
@@ -67,7 +65,11 @@ app.factory( "$Model", function( $http,
             angular.copy( data, self );
             
             return self;
-        } );
+        } ).catch( function( response ) {
+            if( response.status === 401 ) {
+                return dialogs.login().then( self.$save.bind(self) );
+            }
+       } );
 
     }; 
 
@@ -145,21 +147,6 @@ app.factory( "$Model", function( $http,
         } );
         
         return ret;
-    };
-
-    BaseModel.$retryOnUnauthorized = function( fn, ctx ) {
-
-        return function() {
-            return fn.apply( ctx, arguments ).catch( function( error ) {
-                if( error instanceof UnauthorizedError ) {
-
-                    return dialogs.login().then( fn.bind( ctx, arguments ) );
-                } else {
-                    throw error;
-                }
-            } );
-        };
-        
     };
 
     BaseModel.$get = function( id ) {

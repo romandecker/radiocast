@@ -4,7 +4,7 @@
         <label for="email">e-Mail:</label>
         <input type="email"
                ng-readonly="!user.$isNew"
-               value="{{user.email}}"
+               ng-model="user.email"
                placeholder="e-Mail address"
                ng-focus="!user.$isNew"
                class="form-control">
@@ -46,12 +46,13 @@
             {{message.text}}
         </div>
         <div ng-if="user.password.length &&
-                  user.password !== passwordConfirmation"
+                    user.password !== passwordConfirmation"
             class="alert alert-danger">
             Passwords do not match!
         </div>
 
-        <div class="form-group">
+        <div class="form-group"
+             ng-if="currentUser.id === user.id">
             <label for="password">Current password:</label>
             <input type="password"
                    ng-model="oldPassword"

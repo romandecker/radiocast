@@ -4,6 +4,8 @@ var Checkit = require( "checkit" );
 var bookshelf = require( "./BaseModel" );
 var crypto = require( "crypto" );
 var rand = require( "csprng" );
+var _ = require( "underscore" );
+var BPromise = require( "bluebird" );
 
 var validator = new Checkit( {
     email: ["required", "email"]
@@ -11,6 +13,10 @@ var validator = new Checkit( {
 
 var User = bookshelf.model( "User", {
     tableName: "users",
+
+    roles: function() {
+        return this.belongsToMany( "Role" );
+    },
 
     validate: function() {
         return validator.run( this.attributes );
@@ -51,13 +57,28 @@ var User = bookshelf.model( "User", {
     logout: function() {
         return this.save( { session: null }, { patch: true } );
     },
-    pruneSensitiveData: function() {
-        return this.omit( "pwhash",
-                          "salt",
-                          "session",
-                          "deleted" );
+
+    can: function( permission ) {
+        
+        return this.fetch( {
+            withRelated: ["roles","roles.permissions"]
+        } ).then( function(user) {
+            var ret =_.some( user.toJSON().roles, function( role ) {
+                return _.some( role.permissions, function( p ) {
+                    return p.name === permission;
+                } );
+            } );
+
+            if( ret ) {
+                return true;
+            } else {
+                return BPromise.reject( false );
+            }
+            
+        } );
     }
 }, {
+    sensitiveData: ["pwhash", "salt", "session", "deleted" ],
     login: function( username, password, sessionId ) {
         return bookshelf.transaction( function( tx ) {
 
@@ -90,9 +111,7 @@ var User = bookshelf.model( "User", {
     bySession: function( token ) {
         return User.where(
             { session: token }
-        ).fetch().then( function( user ) {
-            return user;
-        } );
+        );
     }
 } );
 

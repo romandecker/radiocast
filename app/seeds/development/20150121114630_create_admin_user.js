@@ -17,9 +17,15 @@ exports.seed = function(knex, Promise) {
 
         // Inserts seed entries
         knex('users').insert( {
+            id: 1,
             email: 'admin@example.org',
             pwhash: sha.digest("hex"),
             salt: salt
+        } ),
+
+        knex("roles_users").insert( {
+            role_id: 1,
+            user_id: 1
         } )
     );
 };

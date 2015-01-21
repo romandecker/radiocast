@@ -12,8 +12,13 @@ app.controller( "UserEditCtrl",
     } else {
         User.$get( $routeParams.id ).then( function( user ) {
             $scope.user = user;
+
+            User.fetchLoggedInUser().then( function(user) {
+                $scope.currentUser = user;
+            } );
         } );
     }
+
 
     $scope.changePassword = function() {
         
