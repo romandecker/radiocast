@@ -4,6 +4,7 @@ var BaseController = require( "./BaseController" );
 var User = require( "../models/User" );
 var CheckitError = require( "checkit" ).Error;
 var _ = require( "underscore" );
+var BPromise = require( "bluebird" );
 
 module.exports = BaseController.extend( {
 
@@ -108,12 +109,28 @@ module.exports = BaseController.extend( {
 
     logout: function( req, res ) {
 
+        req.session.user.logout().then( function() {
+            return new BPromise( function( resolve, reject ) {
+                req.session.destroy( function( err ) {
+                    if( err ) {
+                        reject( err );
+                    } else {
+                        resolve( "ok" );
+                    }
+                } );
+            } );
+        } ).then( function() {
+            res.status( 200 ).send();
+        } ).catch( function(error) {
+            console.error( error );
+            res.status( 500 ).send();
+        } );
+
     },
 
     create: function( req, res ) {
 
         req.session.user.can( "manage_users" ).then( function() {
-        } ).then( function() {
 
             var u = new User( req.body );
             return u.save().then( function() {
@@ -125,7 +142,7 @@ module.exports = BaseController.extend( {
             } );
 
         } ).catch( function() {
-            res.status( 401 ).send();
+            res.status( 403 ).send();
         } );
     },
 
@@ -145,13 +162,13 @@ module.exports = BaseController.extend( {
                 } else if( user.get("id") !== req.session.user.id &&
                            !canChangeOthers ) {
                     return {
-                        status: 401,
+                        status: 403,
                         message: "You cannot change someone else's password!"
                     };
                 } else if( !canChangeOthers &&
                            !user.hasPassword(req.body.oldPassword) ) {
                     return {
-                        status: 401,
+                        status: 400,
                         message: "Current password mismatch"
                     };
                 } else {

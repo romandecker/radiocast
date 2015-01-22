@@ -3,9 +3,8 @@
 var app = angular.module( "yourapp" );
 
 app.factory( "$Model", function( $http,
+                                 AuthenticationService,
                                  DateService,
-                                 ValidationError,
-                                 UnauthorizedError,
                                  dialogs ) {
 
     var BaseModel = function() {
@@ -46,11 +45,11 @@ app.factory( "$Model", function( $http,
             }
         } );
 
-        return $http( {
+        return BaseModel.$http( {
             method: method,
             url: url,
             data: data
-        } ).then( BaseModel.$unpackResponse ).then( function( data ) {
+        } ).then( function( data ) {
 
             if( self.$isNew ) {
                 self.$setNew( false );
@@ -65,44 +64,18 @@ app.factory( "$Model", function( $http,
             angular.copy( data, self );
             
             return self;
-        } ).catch( function( response ) {
-            if( response.status === 401 ) {
-                return dialogs.login().then( self.$save.bind(self) );
-            }
-       } );
-
+        } );
     }; 
 
     BaseModel.prototype.$delete = function() {
 
         var self = this;
-        return $http( {
+        return BaseModel.$http( {
             method: "DELETE",
             url: this.$url + "/" + this.id
         } ).then( function(response) {
-
-            if( response.status === 200 ) {
-                self.$setNew();
-                return true;
-            }
-
-            return new Error( response );
+            self.$setNew();
         } );
-    };
-
-    BaseModel.$unpackResponse = function( response ) {
-        var data = response.data;
-        if( response.status === 400 ) {
-            throw new ValidationError(response.data);
-        } else if( response.status === 401 ) {
-            throw new UnauthorizedError(response.data);
-        } else if( (response.status >= 200 &&
-             response.status < 300) ||
-             response.status === 304) {
-            return data;
-        } else { 
-            throw new Error( response );
-        }
     };
 
     BaseModel.$makeObjectFromResponse = function( data ) {
@@ -151,29 +124,43 @@ app.factory( "$Model", function( $http,
 
     BaseModel.$get = function( id ) {
 
-        var self = this;
-
-        return $http( {
+        return BaseModel.$http( {
             method: "GET",
             url: this.prototype.$url + "/" + id
-        } ).then( BaseModel.$unpackResponse )
-           .then( BaseModel.$makeObjectFromResponse.bind(this) )
-           .catch( function( response ) {
+        } ).then( BaseModel.$makeObjectFromResponse.bind(this) );
+    };
 
-            if( response.status === 401 ) {
-                return dialogs.login().then( self.$get.bind(self, id) );
+    BaseModel.$http = function( req ) {
+
+        var originalArgs = Array.prototype.slice.call( arguments );
+
+        //proxy directly to angular's $http
+        return $http.apply( null, originalArgs ).then( function( response ) {
+            return response.data;
+        } ).catch( function(response) {
+            if( response.status === 401 ) {             // Unauthorized
+
+                if( req.noRetryOnUnauthorized ) {
+                    throw response;
+                } else {
+                    return dialogs.login().then( function() {
+                        return BaseModel.$http.apply( null, originalArgs );
+                    } ).catch( function() {
+                        throw response;
+                    } );
+                } 
             }
-       } );
+        } );
     };
 
     BaseModel.$query = function( params ) {
 
         var self = this;
 
-        return $http( {
+        return BaseModel.$http( {
             method: "GET",
             url: self.$buildQueryString( params )
-        } ).then( BaseModel.$unpackResponse ).then( function( data ) {
+        } ).then( function( data ) {
 
             if( data.constructor === Array ) {
                 var ret = data.map( BaseModel.$makeObjectFromResponse.bind(self) );
@@ -190,17 +177,10 @@ app.factory( "$Model", function( $http,
 
                 data.items = data.items.map(
                     BaseModel.$makeObjectFromResponse.bind(self)
-                );    
+                );
                 data.$paginated = true;
 
                 return data;
-            }
-
-        } ).catch( function( response ) {
-            if( response.status === 401 ) {
-                return dialogs.login().then( self.$query.bind(self, params) );
-            } else {
-                throw response;
             }
         } );
     };

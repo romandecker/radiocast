@@ -59,7 +59,7 @@ app.factory( "User", function( $Model,
                 var self = this;
                 return $http( {
                     method: "GET",
-                    url: "/api/users/loggedIn"
+                    url: "/api/users/me"
                 } ).then( function( response ) {
                     if( response.status === 200 ) {
                         return self.$makeObjectFromResponse( response.data );

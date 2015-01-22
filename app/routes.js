@@ -28,8 +28,8 @@ module.exports.setup = function( app ) {
     router.get( "/users", users.auth.bind(users),
                           users.index.bind(users) );
 
-    router.get( "/users/loggedIn", users.auth.bind(users),
-                                   users.get.bind(users) );
+    router.get( "/users/me", users.auth.bind(users),
+                             users.get.bind(users) );
 
     router.get( "/users/:id", users.auth.bind(users),
                               users.get.bind(users) );
@@ -41,6 +41,8 @@ module.exports.setup = function( app ) {
                            users.create.bind(users) );
 
     router.put( "/auth/login", users.login.bind(users) );
+    router.put( "/auth/logout", users.auth.bind(users),
+                                users.logout.bind(users) );
 
 
     // enable the api routes under "/api"

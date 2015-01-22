@@ -46,6 +46,10 @@
     </script>
     <script
         type="text/javascript"
+        src="public/bower_components/angular-cookies/angular-cookies.min.js">
+    </script>
+    <script
+        type="text/javascript"
         src="public/app.js">
     </script>
     <script
@@ -90,7 +94,9 @@
 
 </head>
 <body ng-app="yourapp">
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="navbar navbar-inverse navbar-fixed-top"
+         role="navigation"
+         ng-controller="NavigationCtrl">
         <div class="container">
             <div class="navbar-header">
                 <button class="navbar-toggle collapsed"
@@ -105,9 +111,15 @@
                 <a class="navbar-brand" href="#">Main</a>
             </div>
             <div class="collapse navbar-collapse">
-                <ul nav-menu class="nav navbar-nav">
+                <ul nav-menu
+                    class="nav navbar-nav"
+                    ng-show="can('manage_users')">
                     <li><a href="#/users">Users</a></li>
                 </ul>
+                <div class="navbar-text pull-right">
+                    <a ng-if="!loggedIn" ng-click="login()" href="#">Log in</a>
+                    <a ng-if="loggedIn" ng-click="logout()" href="#">Log out</a>
+                </div>
             </div>
         </div>
     </div>

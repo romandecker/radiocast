@@ -2,10 +2,13 @@
 
 var app = angular.module( "yourapp" );
 
-app.factory( "AuthenticationService", function( $http ) {
+app.factory( "AuthenticationService", function( $http,
+                                                $rootScope,
+                                                $cookies,
+                                                $q ) {
 
-    var token = null;
     var user = null;
+    var permissions = [];
 
     return {
         login: function( username, password ) {
@@ -18,8 +21,8 @@ app.factory( "AuthenticationService", function( $http ) {
                 }
             } ).then( function( response ) {
                 if( response.status === 200 ) {
-                    token = response.token;
-                    return token;
+                    $rootScope.$broadcast( "login", response.token );
+                    return response.token;
                 } else {
                     throw response;
                 }
@@ -33,11 +36,39 @@ app.factory( "AuthenticationService", function( $http ) {
                 url: "/api/auth/logout"
             } ).then( function( response ) {
                 if( response.status === 200 ) {
-                    token = user = null;
+                    user = null;
+                    delete $cookies.session;
+                    $rootScope.$broadcast( "logout" );
                 } else {
                     throw response;
                 }
             } );
+        },
+        getPermissions: function() {
+            return $http( {
+                method: "GET",
+                url: "/api/users/me"
+            } ).then( function( response ) {
+                var user = response.data;
+                permissions = [];
+
+                angular.forEach( user.roles, function( role ) {
+                    angular.forEach( role.permissions, function( permission ) {
+                        permissions.push( permission.name );
+                    } );
+                } );
+
+                return permissions;
+            } );
+        },
+        isAllowed: function( permission ) {
+
+            if( permissions.indexOf(permission) < 0 ) {
+                return true;
+            } else {
+                return false;
+            }
+
         }
     };
 } );
