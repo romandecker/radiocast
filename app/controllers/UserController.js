@@ -51,16 +51,16 @@ module.exports = BaseController.extend( {
 
         var id = req.params.id;
 
-        var query;
-        if( req.params.id ) {
-            query = User.where( { id: id } );
-        } else if( req.sessionID ) {
-            query = User.bySession( req.sessionID );
-        } else {
-            res.status( 400 ).send();
+        if( !id ) {
+            if( !req.session.user ) {
+                res.status( 400 ).send();
+                return;
+            } else {
+                id = req.session.user.id;
+            }
         }
 
-        query.fetch( {
+        User.where( { id: id } ).fetch( {
             withRelated: ["roles", "roles.permissions"]
         } ).then( function( user ) {
             if( !user ) {
@@ -192,7 +192,16 @@ module.exports = BaseController.extend( {
     auth: function( req, res, next ) {
 
         if( !req.session.user ) {
-            User.bySession( req.sessionID ).fetch( {
+
+            var query;
+            if( process.env.NODE_ENV === "development" ) {
+                // auto log-in in development
+                query = User.where( { id: 1 } );
+            } else {
+                query = User.bySession( req.sessionID );
+            }
+
+            query.fetch( {
                 withRelated: ["roles", "roles.permissions"]
             } ).then( function( user ) {
                 if( user ) {
