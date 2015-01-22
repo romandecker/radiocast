@@ -25,7 +25,6 @@ var BPromise = require( "bluebird" );
 var pad = require( "pad" );
 var _ = require( "underscore" );
 _.mixin( require("underscore.inflections") );
-require( "sugar" );
 
 bookshelf.plugin( "registry" );
 
@@ -81,7 +80,9 @@ bookshelf.Model = bookshelf.Model.extend( {
         // rely on the schema object that has been updated whenever a model is
         // created through our overwritten bookshelf.extend function
         var tableSchema = schema[this.tableName];
-        Object.each( tableSchema, function( name, columnInfo ) {
+
+        _.each( tableSchema, function( columnInfo, name ) {
+
 
             // add fixer functions for date(time) columns
             if( columnInfo.type === "datetime" ) {
@@ -298,7 +299,7 @@ var originalExtend = bookshelf.Model.extend;
  * @public
  */
 bookshelf.Model.extend = function( options ) {
-
+    
     var ret = originalExtend.apply( this, arguments );
 
     var p = knex( options.tableName ).columnInfo().then( function( info ) {

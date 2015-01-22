@@ -19,12 +19,12 @@ var User = bookshelf.model( "User", {
     },
 
     validate: function() {
-        return validator.run( this.attributes );
+        return validator.run( this.toJSON( { shallow: true } ) );
     },
 
 
     saving: function( model, attrs, options ) {
-        
+
         var ret = bookshelf.Model.prototype.saving.apply( this, arguments );
 
         var salt;

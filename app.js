@@ -10,8 +10,6 @@
 require( "string.prototype.endswith" );
 require( "colors" );
 
-require( "sugar" );
-
 //fall back to development, if NODE_ENV is an invalid environment
 if( ["development",
      "production",
@@ -31,9 +29,9 @@ var cookieParser = require( "cookie-parser" );
 var session = require( "express-session" );
 var config = require( "config" );
 var glob = require( "glob" );
+var _ = require( "underscore" );
 
 var routes = require( "./app/routes" );
-var models = require( "./app/models/models" );
 var controllers = require( "./app/controllers/controllers" );
 
 var app = express();
@@ -50,7 +48,6 @@ app.use( session({
 
 var bookshelf = require("./app/models/BaseModel");
 app.set( "bookshelf", bookshelf ); 
-app.set( "models", models );
 
 app.set( "controllers", controllers );
 
@@ -87,7 +84,7 @@ if( config.has("additionalMiddleware") ) {
     //the test-config uses this mechanism to install a coverage-collector,
     //not exactly nice, but it works, so meh...
     var middlewares = config.get( "additionalMiddleware" );
-    Object.each( middlewares, function( route, middleware ) {
+    _.each( middlewares, function( middleware, route ) {
         app.use( route, middleware );
     } );
 }

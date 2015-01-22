@@ -1,5 +1,8 @@
 "use strict";
 
+var istanbul = require( "istanbul" );
+var fs = require( "fs" );
+
 // prevent jshint flagging the node_env parameter of express
 /* jshint camelcase: false */
 
@@ -20,6 +23,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-sass" );
     grunt.loadNpmTasks( "grunt-node-inspector" );
     grunt.loadNpmTasks( "grunt-execute" );
+    grunt.loadNpmTasks( "grunt-mocha-istanbul" );
 
     grunt.initConfig( {
         watch: {
@@ -47,6 +51,15 @@ module.exports = function( grunt ) {
             sass: {
                 files: ["app/public/scss/**/*.scss"],
                 tasks: ["sass"]
+            },
+            tests: {
+                files: ["app.js",
+                        "app/*.js",
+                        "app/models/**/*.js",
+                        "app/controllers/**/*.js"],
+                        // actual test files will be added dynamically by test
+                        // test tasks
+                tasks: ["mochaTest"]
             }
         },
         express: {
@@ -130,8 +143,20 @@ module.exports = function( grunt ) {
         },
         mochaTest: {
             test: {
-                options: { },
+                options: {
+                    clearRequireCache: true
+                },
                 src: ["test/api/**/*.test.js"]
+            }
+        },
+        mocha_istanbul: {
+            coverage: {
+                src: "test/api",
+                options: {
+                    mask:  "*.test.js",
+                    coverageFolder: "test/reports/api/coverage_direct",
+                    quiet: true
+                }
             }
         },
         karma: {
@@ -154,7 +179,7 @@ module.exports = function( grunt ) {
         },
         unzip: {
             coverage: {
-                dest: "test/reports/api/",
+                dest: "test/reports/api/coverage_indirect",
                 src: "test/reports/api/coverage.zip"
             }
         },
@@ -179,7 +204,10 @@ module.exports = function( grunt ) {
             }
         },
         clean: {
-            coverageZip: ["test/reports/api/coverage.zip"],
+            intermediateCoverage: [
+                "test/reports/api/coverage_direct",
+                "test/reports/api/coverage_indirect",
+            ],
             doc: ["doc/**/*"]
         },
         jsdoc: {
@@ -201,7 +229,7 @@ module.exports = function( grunt ) {
         },
         open: {
             coverage: {
-                path: "test/reports/api/lcov-report/index.html"
+                path: "test/reports/api/coverage/lcov-report/index.html"
             },
             inspector: {
                 path: "http://localhost:1337/debug?port=5858"
@@ -222,8 +250,7 @@ module.exports = function( grunt ) {
 
     envs.forEach( function(env) {
         grunt.registerTask( "seed:" + env + ":make",
-                            "Create a new " + env + " seed file.",
-                            function( name ) {
+                            "Create a new " + env + " seed file.", function( name ) {
 
             console.log( "passing", name );
             grunt.task.run( "env:" + env );
@@ -280,11 +307,77 @@ module.exports = function( grunt ) {
                         "Run the API tests and output coverage information",
                         ["env:coverage",
                           "express:test",
-                          "mochaTest",
+                          "mocha_istanbul",
                           "curl:coverage",
                           "unzip:coverage",
-                          "clean:coverageZip",
+                          "coverage:collect",
+                          "clean:intermediateCoverage",
                           "open:coverage"] );
+
+    grunt.registerTask( "coverage:collect", function() {
+        console.log( "collecting coverage information..." );
+
+        var collector = new istanbul.Collector(
+            {},
+            "test/reports/api/coverage"
+        );
+
+        var files = [
+            "test/reports/api/coverage_direct/coverage.json",
+            "test/reports/api/coverage_indirect/coverage.json"
+        ];
+
+        files.forEach( function( file ) {
+            collector.add( JSON.parse(fs.readFileSync(file)) );
+        } );
+
+        var report = istanbul.Report.create(
+            "lcov",
+            { dir: "test/reports/api/coverage" }
+        );
+        report.writeReport( collector, true );
+
+    } );
+
+    grunt.registerTask( "test:api:file",
+                        "Run one test file from the API tests",
+                        function( file, mode ) {
+
+
+        if( mode !== "rerun" ) {
+            grunt.task.run( "express:test" );
+        }
+
+        var path = "test/api/" + file + ".test.js";
+        grunt.config( "mochaTest.test.src", path );
+
+        if( mode === "continuous" ) {
+            var files = grunt.config( "watch.tests.files" );
+            files.push( path );
+            grunt.config( "watch.tests.files", files );
+            grunt.config( "watch.tests.tasks",
+                          ["test:api:file:" + file + ":rerun"] );
+            grunt.task.run( "watch:tests" );
+        } else {
+            grunt.task.run( "mochaTest" );
+        }
+
+    } );
+
+    grunt.registerTask( "test:api:continuous",
+                        "Run all api tests continuously",
+                        function() {
+
+        grunt.task.run( "express:test" );
+        var path = "test/api/**/*.test.js";
+        grunt.config( "mochaTest.test.src", path );
+
+        var files = grunt.config( "watch.tests.files" );
+        files.push( path );
+        grunt.config( "watch.tests.files", files );
+        grunt.task.run( "watch:tests" );
+
+    } );
 
     grunt.registerTask( "test:client", "test:client:single" );
 

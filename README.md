@@ -47,7 +47,7 @@ out `scripts/create_db.sql` in this repo.
 
 In the `config/` folder of this repository, you should find the application's
 configuration files. Go ahead and create a file called `local.json` there. This
-file is purposefully .gitignored and should contain your own personal
+file is deliberately gitignored and should contain your own personal
 configuration options for the application (such as the db-user-password you
 chose for your database user). Fill it with the following:
 
@@ -122,7 +122,7 @@ make sure the required user(s) and database(s) exist and that the appropriate
 privileges are set. Everything else (creating the schema, etc.) will be handled
 by the application (using migrations).
 
-Example for configuring a mysql server:
+Example for configuring a mysql server (`scripts/create_db.sql`)
 
     mysql -u root
     mysql> CREATE DATABASE dbname_development;
@@ -160,8 +160,7 @@ http://bookshelfjs.org/#Model.
     
 You can then use your defined models in your controllers like this:
 
-    var models = app.get( "models" );
-    var User = models.User;
+    var User = require( "../models/User" );
 
     /* ... */
 
@@ -198,12 +197,38 @@ This will perform the given command for the specified environment
 * `migrate:make:<migrationname>`: Create the migration with the given name
   (independent of environment)
 
+Seeds
+-----
+Seeds are used to fill your database with sensible data for its first start. As
+`grunt-knex-migrate` doesn't support this feature yet, seeding is done via a
+custom node-script (`app/seeds/seed.js`). Everything concerning seeds is managed
+via grunt, similar to the way migrations work:
+
+* `seed:<environment>:make:<seedname>`: Creates a seed with the given name for
+  the given environment
+* `seed:<environment>:run`: Runs all seeds for the given environment
+
 Tests
 -----
-Tests can be run via `grunt test`. All tests must be placed inside `test/` and
-have the suffix `.test.js`.
+As the application is split into two parts (front-end and back-end), so are the
+tests. Back-End tests, or API-tests are stored in the `test/api` directory and
+basically perform HTTP-requests against the backend. Client-side tests are
+stored in the `test/client` directory and they test only the client-side by
+mocking the backend-side. Reports will be generated in `test/reports/`.
 
-For easier testing, tests can require `test/testsetup.js` using `require(
-"./testsetup" ). This will instantiate all models and controllers just like the
-app does in order to use them in the tests.
+Testing-related grunt-tasks:
+* `grunt test`: Runs all tests (api and client)
+* `grunt test:api`: Runs api tests only
+* `grunt test:api:coverage`: Runs api tests and outputs coverage information
+  to `test/reports/api/coverage`
+* `grunt test:client`: Runs client tests only. Coverage information is auto-on
+  for client side tests, which can screw up line-numbers in case of errors. Use
+  `grunt test:client:continuous` to disable coverage.
+* `grunt test:client:continuous`: Run client tests and watch for changes. This
+  will automatically re-run tests each time a relevant file changes.
 
+TODO
+----
+
+* Reset whole DB for API-tests
+* Ability to run single tests

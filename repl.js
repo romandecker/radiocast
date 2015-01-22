@@ -21,10 +21,8 @@ if( ["development",
     process.env.NODE_ENV = "development";
 }
 
-var config = require( "config" );
 var glob = require( "glob" );
 
-var models = require( "./app/models/models" );
 var controllers = require( "./app/controllers/controllers" );
 
 var bookshelf = require("./app/models/BaseModel");
@@ -38,6 +36,9 @@ var filesIn = function( directory, suffix ) {
         return file.substring( directory.length+1 );
     } );
 };
+
+var models = filesIn( "app/models", ".js" );
+var controllers = filesIn( "app/controllers", ".js" );
 
 bookshelf.onSchemaLoaded( function() {
 
@@ -54,11 +55,11 @@ bookshelf.onSchemaLoaded( function() {
     };
 
     _.forEach( models, function( model, name ) {
-        server.context[name] = model;
+        server.context[name] = require( model );
     } );
 
     _.forEach( controllers, function( controller, name ) {
-        server.context[name] = controller;
+        server.context[name] = require( controller );
     } );
 
 } );
