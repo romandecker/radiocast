@@ -11,7 +11,7 @@ module.exports = BaseController.extend( {
     Model: User,
 
     pagination: {
-        type: "auto",
+        type: "always",
         perPage: 50,
     },
 
@@ -21,25 +21,14 @@ module.exports = BaseController.extend( {
             var query = User.query();
             var p;
 
-            if( this.pagination &&
-                (this.pagination.type !== "auto" || req.query.page) ) {
-
-                p = this.paginate( query, req.query ).then( function( results ) {
-                    
-                    results.items = results.items.map( function(user) {
-                        return _.omit( user.toJSON(), User.sensitiveData );
-                    } );
-                   
-                    return results;
+            p = this.paginate( query, req.query ).then( function( results ) {
+                
+                results.items = results.items.map( function(user) {
+                    return _.omit( user.toJSON(), User.sensitiveData );
                 } );
-            } else {
-                p = query.select().then( function( results ) {
-                    return User.collection( results ).map( function( user ) {
-                        return _.omit( user.toJSON(), User.sensitiveData );
-                    } );
-                } );
-            }
-
+               
+                return results;
+            } );
 
             p.then( function( results ) {
                 res.json( results );
@@ -102,7 +91,6 @@ module.exports = BaseController.extend( {
                 res.status( 200 ).send();
             }
         } ).catch( function( error ) {
-            console.log( error );
             console.error( error );
             res.status( 500 );
         } );
@@ -218,7 +206,7 @@ module.exports = BaseController.extend( {
                     next();
                 } else {
                     res.status( 401 ).json(
-                        { message: "You must be logged for this request" }
+                        { message: "You must be logged in for this request" }
                     );
                 }
             } );

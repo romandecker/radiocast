@@ -2,7 +2,7 @@
 
 /* jshint expr: true */
 
-describe( "Base model class", function() {
+describe( "Basemodel", function() {
 
     beforeEach( module("yourapp") );
 

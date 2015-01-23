@@ -139,7 +139,6 @@ describe( "User Controller", function() {
             } );
         } );
 
-
     } );
 
     describe( "when logged in as a user who can not manage_users", function() {
@@ -200,25 +199,42 @@ describe( "User Controller", function() {
                 } );
             } );
 
-        } );
-        it( "not be possible to change someone else's password", function() {
-
-            return testutils.createUser( new User( {
-                email: "qwer@qwer.com",
-                password: "qwer"
-            } ) ).then( function( user ) {
-
+            it( "not be possible to change one's own password " + 
+                "when specifying a wrong current password", function() {
                 return agent
-                        .put( "/api/users/" + 
-                                user.get("id") + "/changePassword" )
+                        .put( "/api/users/me/changePassword" )
                         .send( {
-                            oldPassword: "asdf",
+                            oldPassword: "zxcv",
                             newPassword: "qwer"
                         } )
                         .then( function( res ) {
 
-                    expect( res ).to.have.status( 403 );
+                    expect( res ).to.have.status( 400 );
                 } );
+            } );
+
+
+            it( "not be possible to change someone else's password",
+                function() {
+
+                return testutils.createUser( new User( {
+                    email: "qwer@qwer.com",
+                    password: "qwer"
+                } ) ).then( function( user ) {
+
+                    return agent
+                            .put( "/api/users/" + 
+                                    user.get("id") + "/changePassword" )
+                            .send( {
+                                oldPassword: "asdf",
+                                newPassword: "qwer"
+                            } )
+                            .then( function( res ) {
+
+                        expect( res ).to.have.status( 403 );
+                    } );
+                } );
+
             } );
 
         } );
@@ -305,6 +321,69 @@ describe( "User Controller", function() {
 
                 expect( res ).to.have.status( 404 );
             } );
+        } );
+
+        describe( "when changing password", function() {
+            it( "be possible to change one's own password", function() {
+                return agent
+                        .put( "/api/users/me/changePassword" )
+                        .send( {
+                            oldPassword: "asdf",
+                            newPassword: "qwer"
+                        } )
+                        .then( function( res ) {
+
+                    expect( res ).to.have.status( 200 );
+                } );
+            } );
+
+            it( "be possible to change someone else's password",
+                function() {
+
+                return testutils.createUser( new User( {
+                    email: "qwer@qwer.com",
+                    password: "qwer"
+                } ) ).then( function( user ) {
+
+                    return agent
+                            .put( "/api/users/" + 
+                                    user.get("id") + "/changePassword" )
+                            .send( {
+                                newPassword: "asdf"
+                            } )
+                            .then( function( res ) {
+
+                        expect( res ).to.have.status( 200 );
+
+                        return User.where(
+                            { email: "qwer@qwer.com" }
+                        ).fetch().then( function( user ) {
+                            expect( user ).to.exist;
+
+                            expect(user.hasPassword("qwer")).to.equal( false );
+                            expect(user.hasPassword("asdf")).to.equal( true );
+                        } );
+                    } );
+                } );
+
+            } );
+
+            it( "not be possible to change a non-existant user's password",
+                function() {
+
+                return agent
+                        .put( "/api/users/nope/changePassword" )
+                        .send( {
+                            newPassword: "asdf"
+                        } )
+                        .then( function( res ) {
+
+                    expect( res ).to.have.status( 404 );
+
+                } );
+
+            } );
+
         } );
 
     } );

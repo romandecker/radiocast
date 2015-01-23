@@ -12,7 +12,6 @@ var path = require( "path" );
 var dateFormat = require( "dateformat" );
 require( "string.prototype.endswith" );
 require( "colors" );
-require( "sugar" );
 
 var argv = require( "yargs" )
             .usage( "Usage: $0 command [OPTIONS]" )

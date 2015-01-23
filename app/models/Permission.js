@@ -17,7 +17,7 @@ var Permission = bookshelf.model( "Permission", {
     },
 
     roles: function() {
-        return this.belongsToMan( "Role" );
+        return this.belongsToMany( "Role" );
     }
 
 } );
