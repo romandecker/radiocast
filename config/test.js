@@ -21,7 +21,7 @@ module.exports = {
     } ),
     db: {
         connection: {
-            database: "yourapp_test"
+            database: "radiocast_test"
         }
     },
     port: 3001

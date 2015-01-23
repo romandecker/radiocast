@@ -1,0 +1,18 @@
+<h1>Show list</h1>
+
+<paginated ng-model="shows" page="page" perPage="{{perPage}}">
+    <ul ng-show="shows.items.length"
+        ng-repeat="show in shows.items">
+        <li>
+            <a href="#/shows/{{show.id}}">
+                {{show.name}}
+            </a>
+        </li>
+    </ul>
+
+    <p ng-hide="shows.items.length">
+        No shows available!
+    </p>
+
+    <a href="#/shows/create">Create a new show recording</a>
+</paginated>

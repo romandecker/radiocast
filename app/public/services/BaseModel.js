@@ -1,6 +1,6 @@
 "use strict";
 
-var app = angular.module( "yourapp" );
+var app = angular.module( "radiocast" );
 
 app.factory( "$Model", function( $http,
                                  AuthenticationService,
@@ -149,6 +149,8 @@ app.factory( "$Model", function( $http,
                         throw response;
                     } );
                 } 
+            } else {
+                throw response;
             }
         } );
     };

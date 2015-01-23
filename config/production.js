@@ -11,7 +11,7 @@ module.exports = {
     } ),
     db: {
         connection: {
-            database: "yourapp_production",
+            database: "radiocast_production",
         }
     }
 };

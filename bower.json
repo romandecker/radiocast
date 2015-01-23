@@ -1,11 +1,11 @@
 {
-  "name": "yourapp",
+  "name": "radiocast",
   "version": "0.0.0",
-  "homepage": "your homepage",
+  "homepage": "https://github.com/DeX3",
   "authors": [
-    "your name <your.e@mail.com>"
+    "Roman Decker <roma.decker@mail.com>"
   ],
-  "description": "Basic template for various express projects",
+  "description": "Record online radio and provide it as podcast",
   "main": "app.js",
   "moduleType": [
     "node"

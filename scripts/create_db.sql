@@ -1,10 +1,10 @@
 -- adapt this script to your needs
 
-CREATE DATABASE yourapp_development;
-CREATE DATABASE yourapp_test;
-CREATE DATABASE yourapp_production;
-CREATE USER "yourapp"@"localhost" IDENTIFIED BY "yourpassword";
-GRANT ALL PRIVILEGES ON yourapp_development.* TO "yourapp"@"localhost";
-GRANT ALL PRIVILEGES ON yourapp_test.* TO "yourapp"@"localhost";
-GRANT ALL PRIVILEGES ON yourapp_production.* TO "yourapp"@"localhost";
+CREATE DATABASE radiocast_development;
+CREATE DATABASE radiocast_test;
+CREATE DATABASE radiocast_production;
+CREATE USER "radiocast"@"localhost" IDENTIFIED BY "radiocast";
+GRANT ALL PRIVILEGES ON radiocast_development.* TO "radiocast"@"localhost";
+GRANT ALL PRIVILEGES ON radiocast_test.* TO "radiocast"@"localhost";
+GRANT ALL PRIVILEGES ON radiocast_production.* TO "radiocast"@"localhost";
 

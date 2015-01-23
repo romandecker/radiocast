@@ -5,15 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>yourapp</title>
+    <title>Radiocast</title>
 
     <link rel="stylesheet"
           href="public/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet"
           href="public/css/style.css">
-
-    <script
-        type="text/javascript"
+    <script type="text/javascript"
         src="public/bower_components/jquery/dist/jquery.min.js">
     </script>
     <script
@@ -93,7 +91,7 @@
     <% } ); %>
 
 </head>
-<body ng-app="yourapp">
+<body ng-app="radiocast">
     <div class="navbar navbar-inverse navbar-fixed-top"
          role="navigation"
          ng-controller="NavigationCtrl">
@@ -112,8 +110,8 @@
             </div>
             <div class="collapse navbar-collapse">
                 <ul nav-menu
-                    class="nav navbar-nav"
-                    ng-show="can('manage_users')">
+                    class="nav navbar-nav">
+                    <li><a href="#/shows">Shows</a></li>
                     <li><a href="#/users">Users</a></li>
                 </ul>
                 <div class="navbar-text pull-right">

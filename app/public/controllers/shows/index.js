@@ -2,17 +2,17 @@
 
 var app = angular.module( "radiocast" );
 
-app.controller( "UserListCtrl",
+app.controller( "ShowListCtrl",
                 function( $scope,
-                          User ) {
+                          Show ) {
 
     $scope.perPage = 10;
     $scope.$watchGroup( ["page"], function() {
-        User.$query( {
+        Show.$query( {
             page: $scope.page,
             perPage: $scope.perPage,
-        } ).then( function(users) {
-            $scope.users = users;
+        } ).then( function( shows ) {
+            $scope.shows = shows;
         } );
     } );
 

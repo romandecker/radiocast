@@ -1,0 +1,48 @@
+<h1>Edit user</h1>
+<form ng-submit="save()">
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text"
+               ng-model="show.name"
+               required="true"
+               placeholder="Name"
+               ng-focus
+               class="form-control">
+    </div>
+
+    <div class="form-group">
+        <label for="name">Stream URL:</label>
+        <input type="text"
+               ng-model="show.url"
+               required="true"
+               placeholder="mms://some.stream.server/stream"
+               ng-focus
+               class="form-control">
+    </div>
+
+    <div class="form-group">
+        <label for="name">Schedule (CRON Syntax):</label>
+        <input type="text"
+               ng-model="show.schedule"
+               required="true"
+               placeholder="[MINUTE] [HOUR] [DAY OF MONTH] [MONTH OF YEAR] [DAY OF WEEK] [YEAR (optional)]"
+               ng-focus
+               class="form-control">
+    </div>
+
+    <div class="form-group">
+        <label for="name">Duration (seconds):</label>
+        <input type="number"
+               ng-model="show.duration"
+               required="true"
+               placeholder="3600"
+               ng-focus
+               class="form-control">
+    </div>
+
+
+    <div class="form-group">
+        <input type="submit"
+               class="btn btn-primary">
+    </div>
+</div>

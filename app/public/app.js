@@ -1,4 +1,4 @@
-angular.module( "yourapp", [
+angular.module( "radiocast", [
     "ngRoute",
     "ngResource",
     "ngCookies",

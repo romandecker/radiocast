@@ -42,7 +42,7 @@ var controllers = filesIn( "app/controllers", ".js" );
 bookshelf.onSchemaLoaded( function() {
 
     var server = repl.start( {
-        prompt: "yourapp:" + process.env.NODE_ENV + "> "
+        prompt: "radiocast:" + process.env.NODE_ENV + "> "
     } );
 
     // make sure prompt appears only after promise completes for statements

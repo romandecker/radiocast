@@ -1,6 +1,6 @@
 "use strict";
 
-var app = angular.module( "yourapp" );
+var app = angular.module( "radiocast" );
 
 app.filter( "padLeft", function() {
     return function( n, length ) {

@@ -39,10 +39,10 @@ var app = express();
 app.use( config.get("logger") );
 
 app.use( bodyParser.json() );
-app.use( cookieParser("yourappsecret") );
+app.use( cookieParser("a9dUkd00ddmal") );
 app.use( session({
-    name: "yourapp.session",
-    secret: "yourappsecret",
+    name: "radiocast.session",
+    secret: "a9dUkd00ddmal",
     resave: false,
     saveUninitialized: true
 }) );

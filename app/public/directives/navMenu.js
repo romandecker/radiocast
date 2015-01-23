@@ -1,6 +1,6 @@
 "use strict";
 
-var app = angular.module( "yourapp" );
+var app = angular.module( "radiocast" );
 
 app.directive('navMenu', function($location) {
     return function(scope, element, attrs) {

@@ -1,6 +1,6 @@
 "use strict";
 
-var app = angular.module( "yourapp" );
+var app = angular.module( "radiocast" );
 
 app.factory( "ValidationErrorHandler", function( $q, ValidationError ) {
 

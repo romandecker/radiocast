@@ -9,6 +9,7 @@ var express = require( "express" );
 var path = require( "path" );
 
 var UserController = require( "./controllers/UserController" );
+var ShowController = require( "./controllers/ShowController" );
 
 /* does stuff */
 module.exports.setup = function( app ) {
@@ -24,6 +25,7 @@ module.exports.setup = function( app ) {
     } );
 
     var users = new UserController();
+    var shows = new ShowController();
 
     router.get( "/users", users.auth.bind(users),
                           users.index.bind(users) );
@@ -40,9 +42,22 @@ module.exports.setup = function( app ) {
     router.post( "/users", users.auth.bind(users),
                            users.create.bind(users) );
 
+
     router.put( "/auth/login", users.login.bind(users) );
     router.put( "/auth/logout", users.auth.bind(users),
                                 users.logout.bind(users) );
+
+    router.get( "/shows", users.auth.bind(users),
+                          shows.index.bind(shows) );
+
+    router.get( "/shows/:id", users.auth.bind(users),
+                              shows.get.bind(shows) );
+
+    router.post( "/shows", users.auth.bind(users),
+                           shows.create.bind(shows) );
+
+    router.put( "/shows/:id", users.auth.bind(users),
+                              shows.update.bind(shows) );
 
 
     // enable the api routes under "/api"

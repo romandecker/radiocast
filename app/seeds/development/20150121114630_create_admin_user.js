@@ -18,7 +18,7 @@ exports.seed = function(knex, Promise) {
         // Inserts seed entries
         knex('users').insert( {
             id: 1,
-            email: 'admin@example.org',
+            email: 'roman.decker@gmail.com',
             pwhash: sha.digest("hex"),
             salt: salt
         } ),

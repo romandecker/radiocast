@@ -3,7 +3,7 @@
         "client": "mysql",
         "connection": {
             "host": "localhost",
-            "user": "yourapp",
+            "user": "radiocast",
             "charset": "utf8"
         }
     },

@@ -1,6 +1,6 @@
 {
-  "name": "yourapp",
-  "description": "Basic template for express.js/angular apps",
+  "name": "radiocast",
+  "description": "Record online radio and provide it as podcast",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
@@ -39,6 +39,7 @@
     "grunt-env": "^0.4.2",
     "grunt-execute": "^0.2.2",
     "grunt-express-server": "^0.4.19",
+    "grunt-focus": "^0.1.1",
     "grunt-istanbul-reporter": "^0.1.1",
     "grunt-jsdoc": "^0.5.7",
     "grunt-karma": "^0.9.0",

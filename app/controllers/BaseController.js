@@ -179,7 +179,7 @@ var Controller = function() {
      */
     this.create = function( req, res ) {
 
-        var data = Object.merge( req.body, req.query );
+        var data = _.extend( {}, req.body, req.query );
 
         this.Model.forge( data ).save().then( function( savedModel ) {
             res.status( 201 ).json( savedModel );
@@ -205,7 +205,7 @@ var Controller = function() {
     this.update = function( req, res ) {
         
         var id = req.params.id;
-        var data = Object.merge( req.body, req.query );
+        var data = _.extend( {}, req.body, req.query );
 
         this.Model.where( { id: id } ).fetch().then( function( result ) {
             if( !result ) {

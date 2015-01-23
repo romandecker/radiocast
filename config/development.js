@@ -13,7 +13,7 @@ module.exports = {
     } ),
     db: {
         connection: {
-            database: "yourapp_development"
+            database: "radiocast_development"
         }
     }
 };

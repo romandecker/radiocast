@@ -7,7 +7,7 @@ var expect = chai.expect;
 
 var User = require( "../../app/models/User" );
 var apiutils = require( "../api/testutils" );
-var e2eutils = require( "./testutils" );
+//var e2eutils = require( "./testutils" );
 
 describe( "homepage", function() {
     beforeEach( function() {
@@ -15,7 +15,7 @@ describe( "homepage", function() {
     } );
 
     it( "should have a title", function() {
-        return expect( browser.getTitle() ).to.eventually.equal( "yourapp" );
+        return expect( browser.getTitle() ).to.eventually.equal( "Radiocast" );
     } );
 
     it( "should display a login dialog right away", function() {

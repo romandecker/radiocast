@@ -4,7 +4,7 @@
 
 describe( "Basemodel", function() {
 
-    beforeEach( module("yourapp") );
+    beforeEach( module("radiocast") );
 
     afterEach( inject( function( $httpBackend ) {
         $httpBackend.verifyNoOutstandingExpectation();
