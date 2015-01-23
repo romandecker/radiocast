@@ -3,6 +3,9 @@
 var Checkit = require( "checkit" );
 var bookshelf = require( "./BaseModel" );
 
+// make sure permission-model is laoded
+require( "./Permission" );
+
 var validator = new Checkit( {
     name: ["required"]
 } );

@@ -3,10 +3,9 @@
 var repl = require( "repl" );
 var promisify = require( "repl-promised" ).promisify;
 var _ = require( "underscore" );
+var path = require( "path" );
 require( "string.prototype.endswith" );
 require( "colors" );
-
-require( "sugar" );
 
 //fall back to development, if NODE_ENV is an invalid environment
 if( ["development",
@@ -54,12 +53,16 @@ bookshelf.onSchemaLoaded( function() {
         console.dir( arguments );
     };
 
-    _.forEach( models, function( model, name ) {
-        server.context[name] = require( model );
+    _.forEach( models, function( model ) {
+        var ext = path.extname(model);
+        var name = model.substring( 0, model.length - ext.length );
+        server.context[name] = require( "./app/models/" + model );
     } );
 
-    _.forEach( controllers, function( controller, name ) {
-        server.context[name] = require( controller );
+    _.forEach( controllers, function( controller ) {
+        var ext = path.extname(controller);
+        var name = controller.substring( 0, controller.length - ext.length );
+        server.context[name] = require( "./app/controllers/" + controller );
     } );
 
 } );

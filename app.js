@@ -41,6 +41,7 @@ app.use( config.get("logger") );
 app.use( bodyParser.json() );
 app.use( cookieParser("yourappsecret") );
 app.use( session({
+    name: "yourapp.session",
     secret: "yourappsecret",
     resave: false,
     saveUninitialized: true

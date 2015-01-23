@@ -138,11 +138,11 @@ bookshelf.Model = bookshelf.Model.extend( {
             fixDateTimeIn( attrs, column );
         } );
 
-        if( this.writableAttributes.indexOf("updated_at") < 0 ) {
+        if( this.hasTimestamps && this.writableAttributes.indexOf("updated_at") < 0 ) {
             attrs.updated_at = this.attributes.updated_at = new Date();
         }
 
-        if( !this.attributes.created_at ) {
+        if( this.hasTimesetamps && !this.attributes.created_at ) {
             attrs.created_at = this.attributes.created_at = attrs.updated_at;
         }
 

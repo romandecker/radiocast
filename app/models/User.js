@@ -7,6 +7,9 @@ var rand = require( "csprng" );
 var _ = require( "underscore" );
 var BPromise = require( "bluebird" );
 
+// make sure the role-model is loaded
+require( "./Role" );
+
 var validator = new Checkit( {
     email: ["required", "email"]
 } );

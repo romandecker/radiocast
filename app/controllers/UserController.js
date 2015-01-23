@@ -17,33 +17,38 @@ module.exports = BaseController.extend( {
 
     index: function( req, res ) {
 
-        var query = User.query();
-        var p;
+        req.session.user.can( "manage_users" ).bind( this ).then( function() {
+            var query = User.query();
+            var p;
 
-        if( this.pagination &&
-            (this.pagination.type !== "auto" || req.query.page) ) {
+            if( this.pagination &&
+                (this.pagination.type !== "auto" || req.query.page) ) {
 
-            p = this.paginate( query, req.query ).then( function( results ) {
-                
-                results.items = results.items.map( function(user) {
-                    return _.omit( user.toJSON(), User.sensitiveData );
+                p = this.paginate( query, req.query ).then( function( results ) {
+                    
+                    results.items = results.items.map( function(user) {
+                        return _.omit( user.toJSON(), User.sensitiveData );
+                    } );
+                   
+                    return results;
                 } );
-               
-                return results;
-            } );
-        } else {
-            p = query.select().then( function( results ) {
-                return User.collection( results ).map( function( user ) {
-                    return _.omit( user.toJSON(), User.sensitiveData );
+            } else {
+                p = query.select().then( function( results ) {
+                    return User.collection( results ).map( function( user ) {
+                        return _.omit( user.toJSON(), User.sensitiveData );
+                    } );
                 } );
-            } );
-        }
+            }
 
-        p.then( function( results ) {
-            res.json( results );
-        } ).catch( function( error ) {
-            console.error( error );
-            res.status( 500 ).json( error );
+
+            p.then( function( results ) {
+                res.json( results );
+            } ).catch( function( error ) {
+                console.error( error );
+                res.status( 500 ).json( error );
+            } );
+        } ).catch( function( err ) {
+            res.status( 403 ).send();
         } );
     },
 
@@ -52,12 +57,8 @@ module.exports = BaseController.extend( {
         var id = req.params.id;
 
         if( !id ) {
-            if( !req.session.user ) {
-                res.status( 400 ).send();
-                return;
-            } else {
-                id = req.session.user.id;
-            }
+            // req.session.user will always be set because of auth
+            id = req.session.user.id;
         }
 
         User.where( { id: id } ).fetch( {
@@ -101,6 +102,7 @@ module.exports = BaseController.extend( {
                 res.status( 200 ).send();
             }
         } ).catch( function( error ) {
+            console.log( error );
             console.error( error );
             res.status( 500 );
         } );
@@ -134,7 +136,7 @@ module.exports = BaseController.extend( {
 
             var u = new User( req.body );
             return u.save().then( function() {
-                res.status( 200 ).send();
+                res.status( 201 ).send();
             } ).catch( CheckitError, function( error ) {
                 res.status( 400 ).json( error );
             } ).catch( function( error ) {
@@ -149,8 +151,15 @@ module.exports = BaseController.extend( {
     changePassword: function( req, res ) {
 
         var id = req.params.id;
+
+        var query;
+        if( id === "me" ) {
+            query = req.session.user;
+        } else {
+            query = User.where( { id: id } );
+        }
         
-        User.where( {id: id} ).fetch().then( function( user ) {
+        query.fetch().then( function( user ) {
 
             return req.session.user.can( "manage_users" ).then(
                 function() { return true; },
@@ -220,6 +229,7 @@ module.exports = BaseController.extend( {
                 req.session.user = user;
                 next();
             } ).catch( function( error ) {
+                console.error( error );
                 next( error );
             } );
         }

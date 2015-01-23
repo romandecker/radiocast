@@ -232,3 +232,4 @@ TODO
 
 * Reset whole DB for API-tests
 * Ability to run single tests
+* Watch: restart express (not only tests) when an app-file changes

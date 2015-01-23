@@ -10,6 +10,8 @@ var validator = new Checkit( {
 var Permission = bookshelf.model( "Permission", {
     tableName: "permissions",
 
+    hasTimestamps: false,
+
     validate: function() {
         return validator.run( this.attributes );
     },

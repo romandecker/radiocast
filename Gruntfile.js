@@ -144,7 +144,8 @@ module.exports = function( grunt ) {
         mochaTest: {
             test: {
                 options: {
-                    clearRequireCache: true
+                    clearRequireCache: true,
+                    reporter: "spec"
                 },
                 src: ["test/api/**/*.test.js"]
             }
