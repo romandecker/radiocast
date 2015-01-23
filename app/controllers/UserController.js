@@ -190,8 +190,10 @@ module.exports = BaseController.extend( {
 
         if( !req.session.user ) {
 
+
             var query;
-            if( process.env.NODE_ENV === "development" ) {
+            if( process.env.NODE_ENV === "development" &&
+                process.env.AUTOLOGIN !== "false" ) {
                 // auto log-in in development
                 query = User.where( { id: 1 } );
             } else {
@@ -205,6 +207,7 @@ module.exports = BaseController.extend( {
                     req.session.user = user;
                     next();
                 } else {
+                    req.session.user = null;
                     res.status( 401 ).json(
                         { message: "You must be logged in for this request" }
                     );

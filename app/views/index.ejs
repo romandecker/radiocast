@@ -117,8 +117,10 @@
                     <li><a href="#/users">Users</a></li>
                 </ul>
                 <div class="navbar-text pull-right">
-                    <a ng-if="!loggedIn" ng-click="login()" href="#">Log in</a>
-                    <a ng-if="loggedIn" ng-click="logout()" href="#">Log out</a>
+                    <a class="login"
+                       ng-if="!loggedIn" ng-click="login()" href="#">Log in</a>
+                    <a class="logout"
+                       ng-if="loggedIn" ng-click="logout()" href="#">Log out</a>
                 </div>
             </div>
         </div>

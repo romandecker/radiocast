@@ -10,6 +10,7 @@ module.exports = function( grunt ) {
 
     grunt.loadNpmTasks( "grunt-express-server" );
     grunt.loadNpmTasks( "grunt-contrib-watch" );
+    grunt.loadNpmTasks( "grunt-focus" );
     grunt.loadNpmTasks( "grunt-contrib-jshint" );
     grunt.loadNpmTasks( "grunt-contrib-clean" );
     grunt.loadNpmTasks( "grunt-mocha-test" );
@@ -24,6 +25,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( "grunt-node-inspector" );
     grunt.loadNpmTasks( "grunt-execute" );
     grunt.loadNpmTasks( "grunt-mocha-istanbul" );
+    grunt.loadNpmTasks( "grunt-protractor-runner" );
 
     grunt.initConfig( {
         watch: {
@@ -57,9 +59,17 @@ module.exports = function( grunt ) {
                         "app/*.js",
                         "app/models/**/*.js",
                         "app/controllers/**/*.js"],
-                        // actual test files will be added dynamically by test
+                        // actual test files will be added dynamically by
                         // test tasks
                 tasks: ["mochaTest"]
+            }
+        },
+        focus: {
+            development: {
+                include: ["express", "public", "sass"]
+            },
+            test: {
+                include: ["test"]
             }
         },
         express: {
@@ -109,9 +119,7 @@ module.exports = function( grunt ) {
                     },
                     pool: {
                         max: 1
-                    }
-                };
-                
+                    } }; 
                 cb( null, cfg );
             }
         },
@@ -176,13 +184,28 @@ module.exports = function( grunt ) {
             coverage: {
                 dest: "test/reports/api/coverage.zip",
                 src: "http://localhost:3001/coverage/download"
-            }
+            },
         },
         unzip: {
             coverage: {
                 dest: "test/reports/api/coverage_indirect",
                 src: "test/reports/api/coverage.zip"
             }
+        },
+        protractor: {
+            options: {
+                
+            },
+            e2e: {
+                configFile: "test/e2e/conf.js"
+            }
+        },
+        mochaProtractor: {
+            options: {
+                browsers: ["Chrome"],
+                baseUrl: "http://localhost:3001/"
+            },
+            files: ["test/e2e/**/*.test.js"]
         },
         sass: {
             options: {
@@ -209,7 +232,8 @@ module.exports = function( grunt ) {
                 "test/reports/api/coverage_direct",
                 "test/reports/api/coverage_indirect",
             ],
-            doc: ["doc/**/*"]
+            doc: ["doc/**/*"],
+            seleniumStopLog: ["logs/seleniumStop.log"]
         },
         jsdoc: {
             dist: {
@@ -291,9 +315,10 @@ module.exports = function( grunt ) {
     } );
 
 
-
     //lint once, then start server and watch for changes
-    grunt.registerTask( "server", ["lint", "express:development", "watch"] );
+    grunt.registerTask( "server", ["lint",
+                                   "express:development",
+                                   "focus:development"] );
 
     grunt.registerTask( "server:debug", ["express:debug",
                                          "open:inspector",
@@ -389,6 +414,11 @@ module.exports = function( grunt ) {
     grunt.registerTask( "test:client:continuous",
                         "Run the client tests continuously",
                         "karma:continuous" );
+
+    grunt.registerTask( "test:e2e",
+                        "Run the end-to-end tests",
+                        ["express:test",
+                         "protractor:e2e"]);
 
     grunt.registerTask( "test",
                         "Run all tests",

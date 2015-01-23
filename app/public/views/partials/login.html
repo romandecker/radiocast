@@ -2,9 +2,12 @@
     <div class="modal-header">
         <h3>Login</h3>
     </div>
-    <div class="modal-body select-reservation-dialog">
+    <div class="modal-body login-dialog">
 
-        <div ng-if="loginFailed">Invalid username or password!</div>
+        <div ng-if="loginFailed"
+             class="alert alert-danger">
+            Invalid username or password!
+        </div>
         
         <div class="input-group">
             <span class="input-group-addon">
