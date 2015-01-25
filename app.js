@@ -90,7 +90,12 @@ if( config.has("additionalMiddleware") ) {
     } );
 }
 
+
 bookshelf.onSchemaLoaded( function() {
+
+    var Show = require( "./app/models/Show" );
+    Show.rescheduleAll();
+
     var server = app.listen( config.get("port"), function() {
         //this output is actually needed for starting the app via grunt
         console.log( "Listening on port %d in %s", server.address().port,

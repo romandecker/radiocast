@@ -2,3 +2,4 @@ node_modules
 test/reports/api/tests.log
 config/local*
 logs/*
+data/*

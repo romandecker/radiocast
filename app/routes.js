@@ -19,6 +19,8 @@ module.exports.setup = function( app ) {
     // serve static files under "/public"
     app.use( "/public", express.static(path.join(__dirname, "public")) );
 
+    app.use( "/recordings", express.static("data/recordings") );
+
     // main page
     app.get( "/", function( req, res ) {
         res.render( "index" );
@@ -58,6 +60,8 @@ module.exports.setup = function( app ) {
 
     router.put( "/shows/:id", users.auth.bind(users),
                               shows.update.bind(shows) );
+
+    router.get( "/shows/:id/rss", shows.rss.bind(shows) );
 
 
     // enable the api routes under "/api"

@@ -83,7 +83,6 @@ bookshelf.Model = bookshelf.Model.extend( {
 
         _.each( tableSchema, function( columnInfo, name ) {
 
-
             // add fixer functions for date(time) columns
             if( columnInfo.type === "datetime" ) {
                 self.dateTimes.push( name );
@@ -138,11 +137,8 @@ bookshelf.Model = bookshelf.Model.extend( {
             fixDateTimeIn( attrs, column );
         } );
 
-        if( this.hasTimestamps && this.writableAttributes.indexOf("updated_at") < 0 ) {
+        if( this.hasTimestamps ) {
             attrs.updated_at = this.attributes.updated_at = new Date();
-        }
-
-        if( this.hasTimesetamps && !this.attributes.created_at ) {
             attrs.created_at = this.attributes.created_at = attrs.updated_at;
         }
 
